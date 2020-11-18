@@ -39,32 +39,37 @@ const EditInvoice = ({ match }) => {
   }, [dispatch, match.params.id]);
 
   useEffect(() => {
-    reset(invoice);
-  }, [reset, invoice]);
+    reset({
+      ...invoice,
+      items: Object.keys(invoice).length ? invoice.items : [],
+    }); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invoice]);
 
   const onSubmit = async (invoiceData) => {
     dispatch(editInvoice(invoice._id, invoiceData, history));
   };
+  let sum = (a) => a.reduce((x, y) => x + y);
 
   const calcGrantTotal = () => {
-    let sum = (a) => a.reduce((x, y) => x + y);
-    let sumAmount = sum(items.map((x) => Number(x.totalMoney)));
-    return sumAmount.toFixed(2);
+    if (items.length) {
+      let sumAmount = sum(items.map((x) => Number(x.totalMoney)));
+      return sumAmount.toFixed(2);
+    }
   };
-
   const calcSubTotal = () => {
-    let sum = (a) => a.reduce((x, y) => x + y);
-    let sumAmount = sum(items.map((x) => Number(x.priceNoVat)));
-    return sumAmount.toFixed(2);
+    if (items.length) {
+      let sumAmount = sum(items.map((x) => Number(x.priceNoVat)));
+      return sumAmount.toFixed(2);
+    }
   };
 
   const calcTaxTotal = () => {
-    let sum = (a) => a.reduce((x, y) => x + y);
-    let sumGrandTotal = sum(items.map((x) => Number(x.totalMoney)));
-    let sumSubTotal = sum(items.map((x) => Number(x.priceNoVat)));
-    return (sumGrandTotal - sumSubTotal).toFixed(2);
+    if (items.length) {
+      let sumGrandTotal = sum(items.map((x) => Number(x.totalMoney)));
+      let sumSubTotal = sum(items.map((x) => Number(x.priceNoVat)));
+      return (sumGrandTotal - sumSubTotal).toFixed(2);
+    }
   };
-
   return isLoading ? (
     <Loader />
   ) : (
@@ -453,101 +458,102 @@ const EditInvoice = ({ match }) => {
                 <th className='text-center'> Price including VAT </th>
               </tr>
             </thead>
-            {fields.map((item, index) => {
-              counter++;
-              return (
-                <tbody key={item.id}>
-                  <tr id='addr0'>
-                    <td>{counter}</td>
-                    <td className='row__position'>
-                      <Form.Control
-                        name={`items[${index}].productName`}
-                        defaultValue={item.productName}
-                        type='text'
-                        className='form-control dynamic__fields'
-                        ref={register({
-                          required: 'Product name is required.',
-                        })}
-                      />
-                      <ErrorMessage
-                        errors={errors}
-                        name={`items[${index}].productName`}
-                        as='p'
-                      />
-                    </td>
-                    <td>
-                      <Form.Control
-                        type='number'
-                        name={`items[${index}].unitCost`}
-                        defaultValue={item.unitCost}
-                        className='form-control dynamic__fields'
-                        ref={register({
-                          required: 'Unit cost is required.',
-                        })}
-                      />
-                      <ErrorMessage
-                        errors={errors}
-                        name={`items[${index}].unitCost`}
-                        as='p'
-                      />
-                    </td>
-                    <td>
-                      <Form.Control
-                        name={`items[${index}].qty`}
-                        defaultValue={item.qty}
-                        type='number'
-                        className='form-control dynamic__fields'
-                        ref={register({
-                          required: 'Quantity is required.',
-                        })}
-                      />
-                      <ErrorMessage
-                        errors={errors}
-                        name={`items[${index}].qty`}
-                        as='p'
-                      />
-                    </td>
-                    <td>
-                      <NoVatPrice
-                        name={`items[${index}].priceNoVat`}
-                        index={index}
-                        register={register()}
-                        control={control}
-                      />
-                    </td>
-                    <td>
-                      <Form.Control
-                        defaultValue={item.vat}
-                        name={`items[${index}].vat`}
-                        type='number'
-                        className='form-control dynamic__fields'
-                        ref={register({
-                          required: 'Vat % is required.',
-                        })}
-                      />
-                      <ErrorMessage
-                        errors={errors}
-                        name={`items[${index}].vat`}
-                        as='p'
-                      />
-                    </td>
-                    <td>
-                      <VatPrice
-                        register={register()}
-                        control={control}
-                        index={index}
-                      />
-                    </td>
-                    <td
-                      className='delete__button'
-                      onClick={() => remove(index)}
-                    >
-                      <i className='fas fa-trash-alt'></i>
-                    </td>
-                  </tr>
-                </tbody>
-              );
-            })}
+            {fields &&
+              fields.map((item, index) => {
+                counter++;
+                return (
+                  <tbody key={item.id}>
+                    <tr id='addr0'>
+                      <td>{counter}</td>
+                      <td className='row__position'>
+                        <Form.Control
+                          name={`items[${index}].productName`}
+                          defaultValue={item.productName}
+                          type='text'
+                          className='form-control dynamic__fields'
+                          ref={register({
+                            required: 'Product name is required.',
+                          })}
+                        />
+                        <ErrorMessage
+                          errors={errors}
+                          name={`items[${index}].productName`}
+                          as='p'
+                        />
+                      </td>
+                      <td>
+                        <Form.Control
+                          type='number'
+                          name={`items[${index}].unitCost`}
+                          defaultValue={item.unitCost}
+                          className='form-control dynamic__fields'
+                          ref={register({
+                            required: 'Unit cost is required.',
+                          })}
+                        />
+                        <ErrorMessage
+                          errors={errors}
+                          name={`items[${index}].unitCost`}
+                          as='p'
+                        />
+                      </td>
+                      <td>
+                        <Form.Control
+                          name={`items[${index}].qty`}
+                          defaultValue={item.qty}
+                          type='number'
+                          className='form-control dynamic__fields'
+                          ref={register({
+                            required: 'Quantity is required.',
+                          })}
+                        />
+                        <ErrorMessage
+                          errors={errors}
+                          name={`items[${index}].qty`}
+                          as='p'
+                        />
+                      </td>
+                      <td>
+                        <NoVatPrice
+                          name={`items[${index}].priceNoVat`}
+                          index={index}
+                          register={register()}
+                          control={control}
+                        />
+                      </td>
+                      <td>
+                        <Form.Control
+                          defaultValue={item.vat}
+                          name={`items[${index}].vat`}
+                          type='number'
+                          className='form-control dynamic__fields'
+                          ref={register({
+                            required: 'Vat % is required.',
+                          })}
+                        />
+                        <ErrorMessage
+                          errors={errors}
+                          name={`items[${index}].vat`}
+                          as='p'
+                        />
+                      </td>
+                      <td>
+                        <VatPrice
+                          register={register()}
+                          control={control}
+                          index={index}
+                        />
+                      </td>
+                      <td
+                        className='delete__button'
+                        onClick={() => remove(index)}
+                      >
+                        <i className='fas fa-trash-alt'></i>
+                      </td>
+                    </tr>
+                  </tbody>
+                );
+              })}
           </table>
         </div>
       </div>

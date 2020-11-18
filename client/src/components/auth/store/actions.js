@@ -98,7 +98,7 @@ export const loadUser = () => async (dispatch, getState) => {
     dispatch(loaderOff());
   } catch (err) {
     dispatch(loaderOff());
-    // dispatch(getErrors(err.response.data.message, err.response.status));
+    dispatch(getErrors(err.response.data.message, err.response.status));
     dispatch({
       type: types.AUTH_ERROR,
     });

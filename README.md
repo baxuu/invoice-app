@@ -30,6 +30,10 @@ App is deployed using Heroku for backend and Netflify for frontend. [Link](https
 ![](https://raw.githubusercontent.com/baxuu/invoice-app/master/client/src/assets/example1.jpg)
 ![](https://raw.githubusercontent.com/baxuu/invoice-app/master/client/src/assets/invoiceappp.gif)
 
+## Requirements
+
+You need at the latest Node -v 13.2.0 to support ECMAScript modules used on backend (import and export statements). 
+
 
 ## Installation
 
